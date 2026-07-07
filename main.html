@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ต้นทุนเวลาที่เสียไป</title>
+<style>
+  :root{
+    --bg:#faf9f7;
+    --ink:#1c1c1e;
+    --muted:#6b7280;
+    --line:#e7e5e2;
+    --accent:#3b6e5e;
+    --accent-soft:#e7f0ec;
+    --warn:#b5533c;
+    --warn-soft:#f6e9e4;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;margin:0;}
+  body{
+    background:#0f0f0e;
+    color:var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Sarabun, Roboto, sans-serif;
+    -webkit-font-smoothing:antialiased;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+  }
+
+  .sheet{
+    background:var(--bg);
+    width:100vw;
+    height:100vh;
+    max-width:calc(100vh * 16 / 9);
+    max-height:calc(100vw * 9 / 16);
+    padding:clamp(14px,2vh,28px) clamp(18px,2.4vw,36px);
+    display:flex;
+    flex-direction:column;
+    gap:clamp(8px,1.4vh,16px);
+  }
+
+  header{flex:0 0 auto; display:flex; align-items:baseline; justify-content:space-between; gap:16px; flex-wrap:wrap;}
+  header h1{font-size:clamp(16px,2vw,22px);font-weight:700;margin:0;letter-spacing:-0.01em;}
+  header p{color:var(--muted);margin:0;font-size:clamp(11px,1.05vw,13px);line-height:1.4;}
+
+  .main{
+    flex:1 1 auto;
+    min-height:0;
+    display:grid;
+    grid-template-columns: 1.05fr 0.85fr 1.1fr;
+    gap:clamp(10px,1.4vw,18px);
+  }
+
+  .card{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:clamp(12px,1.6vh,18px) clamp(14px,1.6vw,20px);
+    display:flex;
+    flex-direction:column;
+    min-height:0;
+  }
+
+  /* --- controls column --- */
+  .controls{justify-content:space-between;}
+  .control{display:flex; flex-direction:column;}
+  .control .top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px;}
+  .control label{font-size:clamp(11px,1.1vw,13px);font-weight:600;}
+  .control .val{font-size:clamp(11px,1.1vw,13px);font-weight:700;color:var(--accent);white-space:nowrap;}
+  .control .help{font-size:clamp(9.5px,0.95vw,11px);color:var(--muted);margin-bottom:6px;line-height:1.35;}
+  input[type=range]{
+    width:100%;
+    -webkit-appearance:none;
+    height:4px;
+    border-radius:99px;
+    background:var(--line);
+    outline:none;
+    margin:2px 0;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    width:15px;height:15px;border-radius:50%;
+    background:#fff; border:2px solid var(--accent); cursor:pointer;
+    box-shadow:0 1px 3px rgba(0,0,0,0.15);
+  }
+  input[type=range]::-moz-range-thumb{
+    width:15px;height:15px;border-radius:50%;
+    background:#fff;border:2px solid var(--accent);cursor:pointer;
+  }
+
+  /* --- result column --- */
+  .result{align-items:center; justify-content:center; text-align:center;}
+  .result .pct{font-size:clamp(34px,5.6vw,58px);font-weight:800;line-height:1;letter-spacing:-0.02em;}
+  .result .pct-label{color:var(--muted);font-size:clamp(10px,1vw,12px);margin-top:4px;}
+  .bar{position:relative;height:7px;background:var(--line);border-radius:99px;margin:clamp(10px,1.6vh,18px) 0 6px;width:100%;}
+  .bar-fill{position:absolute; top:0; left:0; height:100%; border-radius:99px; background:var(--accent); transition:width .3s ease, background .3s ease;}
+  .bar-mark{position:absolute; top:-3px; left:50%; width:2px; height:13px; background:#c9c6c1; transform:translateX(-1px);}
+  .bar-caption{display:flex;justify-content:space-between;font-size:9.5px;color:#a3a3a3;width:100%;}
+  .message{
+    margin-top:clamp(8px,1.4vh,16px);
+    font-size:clamp(10.5px,1.05vw,12.5px);
+    line-height:1.45;
+    color:#3f3f3f;
+    padding:10px 12px;
+    border-radius:10px;
+    background:var(--accent-soft);
+    text-align:left;
+    overflow-y:auto;
+  }
+  .message.warn{background:var(--warn-soft); color:#5c342a;}
+  .message strong{font-weight:700;}
+
+  /* --- charts column --- */
+  .charts-col{display:flex; flex-direction:column; gap:clamp(8px,1.2vh,14px); min-height:0;}
+  .chart-card{flex:1 1 0; min-height:0; display:flex; flex-direction:column;}
+  .chart-card h2{font-size:clamp(10.5px,1.05vw,12.5px);font-weight:700;margin:0;}
+  .chart-card .desc{font-size:clamp(9px,0.9vw,10.5px);color:var(--muted);margin:1px 0 4px;}
+  .chart-box{flex:1; min-height:0;}
+  .chart-box svg{display:block;width:100%;height:100%;}
+
+  .foot-note{flex:0 0 auto; font-size:clamp(9px,0.85vw,10.5px);color:#b0aca6;text-align:center;line-height:1.4;}
+
+  @media (max-aspect-ratio: 4/5){
+    .sheet{max-height:none;}
+    .main{grid-template-columns:1fr;grid-auto-rows:auto;overflow-y:auto;}
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <header>
+    <h1>ต้นทุนเวลาที่เสียไป</h1>
+    <p>ปรับตัวเลขแล้วดูว่านิสัยประจำวันส่งผลต่อเป้าหมาย 3 ปีข้างหน้าอย่างไร</p>
+  </header>
+
+  <div class="main">
+
+    <div class="card controls">
+      <div class="control">
+        <div class="top">
+          <label>เวลาที่หลุดโฟกัสต่อวัน</label>
+          <span class="val"><span id="distractionVal">30</span> นาที</span>
+        </div>
+        <div class="help">เลื่อนโซเชียล เล่นเกมเกินแผน หรือผัดวันโดยไม่ตั้งใจ</div>
+        <input type="range" id="distraction" min="0" max="300" step="5" value="30">
+      </div>
+
+      <div class="control">
+        <div class="top">
+          <label>อัตราผลกระทบต่อเนื่อง</label>
+          <span class="val"><span id="networkRateVal">15</span>%</span>
+        </div>
+        <div class="help">โอกาสที่พลาดไปกระทบโอกาสอื่นต่อเป็นลูกโซ่ ยิ่งสูงยิ่งขยายตัวเร็ว</div>
+        <input type="range" id="networkRate" min="0" max="50" step="5" value="15">
+      </div>
+
+      <div class="control">
+        <div class="top">
+          <label>ชั่วโมงฝึกฝนที่ต้องใช้รวม</label>
+          <span class="val"><span id="goalHoursVal">5,000</span> ชม.</span>
+        </div>
+        <div class="help">เวลาสะสมที่เป้าหมายนี้ต้องการ เช่น สอบติดคณะที่หวัง</div>
+        <input type="range" id="goalHours" min="500" max="15000" step="250" value="5000">
+      </div>
+    </div>
+
+    <div class="card result">
+      <div class="pct" id="pctValue">—</div>
+      <div class="pct-label">โอกาสสำเร็จในโมเดล (สิ้นปีที่ 3)</div>
+      <div class="bar">
+        <div class="bar-fill" id="barFill"></div>
+        <div class="bar-mark"></div>
+      </div>
+      <div class="bar-caption"><span>0%</span><span>50%</span><span>100%</span></div>
+      <div class="message" id="message"></div>
+    </div>
+
+    <div class="charts-col">
+      <div class="card chart-card">
+        <h2>แนวโน้มโอกาสสำเร็จตลอด 3 ปี</h2>
+        <p class="desc">เทียบกับเส้นอ้างอิง 50%</p>
+        <div class="chart-box" id="chartProb"></div>
+      </div>
+      <div class="card chart-card">
+        <h2>โอกาสสะสมที่อาจได้รับผลกระทบ</h2>
+        <p class="desc">ผลกระทบต่อเนื่องแบบทวีคูณ (A = P(1+r)^t)</p>
+        <div class="chart-box" id="chartOpp"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <p class="foot-note">แบบจำลองอย่างง่ายเพื่อช่วยให้เห็นภาพ ไม่ใช่การพยากรณ์ที่แม่นยำ — เป็นเครื่องมือคิด ไม่ใช่คำตัดสินอนาคต</p>
+
+</div>
+
+<script>
+const MONTHS = 36;
+const NS = 'http://www.w3.org/2000/svg';
+
+function computeData(distractionMinutes, networkEffectRate, dreamGoalHours){
+  let data = [];
+  let cumulativeLostHours = 0;
+  const hoursPerOpportunity = 20;
+  for(let month=1; month<=MONTHS; month++){
+    const lostHoursThisMonth = (distractionMinutes*20)/60;
+    cumulativeLostHours += lostHoursThisMonth;
+    const baseMissedOpp = cumulativeLostHours / hoursPerOpportunity;
+    const compoundedMissedOpp = baseMissedOpp * Math.pow(1 + networkEffectRate/100, month/12);
+    let probability = 100 - (cumulativeLostHours/dreamGoalHours)*100*3;
+    if(probability < 0) probability = 0;
+    data.push({
+      month,
+      compoundedOpportunities: parseFloat(compoundedMissedOpp.toFixed(1)),
+      successProbability: parseFloat(probability.toFixed(1))
+    });
+  }
+  let tippingMonth = data.findIndex(d=>d.successProbability<=50);
+  tippingMonth = tippingMonth === -1 ? null : tippingMonth+1;
+  const safeMinutes = Math.max(0, Math.floor(dreamGoalHours/72));
+  const finalProbability = data[data.length-1].successProbability;
+  return { data, tippingMonth, safeMinutes, finalProbability };
+}
+
+function renderLineChart(containerId, values, opts){
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  const W = 400, H = 140, padL = 28, padR = 8, padT = 8, padB = 16;
+  const plotW = W - padL - padR, plotH = H - padT - padB;
+
+  const minV = opts.min !== undefined ? opts.min : Math.min(...values);
+  const maxV = opts.max !== undefined ? opts.max : Math.max(...values);
+  const range = (maxV - minV) || 1;
+
+  const svg = document.createElementNS(NS, 'svg');
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.setAttribute('preserveAspectRatio', 'none');
+
+  const xAt = (i) => padL + (i/(values.length-1)) * plotW;
+  const yAt = (v) => padT + plotH - ((v - minV)/range) * plotH;
+
+  [minV, (minV+maxV)/2, maxV].forEach((gv)=>{
+    const y = yAt(gv);
+    const gl = document.createElementNS(NS,'line');
+    gl.setAttribute('x1', padL); gl.setAttribute('x2', W-padR);
+    gl.setAttribute('y1', y); gl.setAttribute('y2', y);
+    gl.setAttribute('stroke', '#f0efec'); gl.setAttribute('stroke-width', '1');
+    svg.appendChild(gl);
+    const lbl = document.createElementNS(NS,'text');
+    lbl.setAttribute('x', padL-5); lbl.setAttribute('y', y+3);
+    lbl.setAttribute('text-anchor','end'); lbl.setAttribute('font-size','8');
+    lbl.setAttribute('fill','#a3a3a3');
+    lbl.textContent = Math.round(gv);
+    svg.appendChild(lbl);
+  });
+
+  [0, values.length-1].forEach((i)=>{
+    const lbl = document.createElementNS(NS,'text');
+    lbl.setAttribute('x', xAt(i)); lbl.setAttribute('y', H-4);
+    lbl.setAttribute('text-anchor', i===0?'start':'end');
+    lbl.setAttribute('font-size','8'); lbl.setAttribute('fill','#a3a3a3');
+    lbl.textContent = `ด.${i+1}`;
+    svg.appendChild(lbl);
+  });
+
+  if(opts.refValue !== undefined){
+    const ry = yAt(opts.refValue);
+    const rl = document.createElementNS(NS,'line');
+    rl.setAttribute('x1', padL); rl.setAttribute('x2', W-padR);
+    rl.setAttribute('y1', ry); rl.setAttribute('y2', ry);
+    rl.setAttribute('stroke', '#c9c6c1'); rl.setAttribute('stroke-width','1.2');
+    rl.setAttribute('stroke-dasharray','4 4');
+    svg.appendChild(rl);
+  }
+
+  const pts = values.map((v,i)=>`${xAt(i)},${yAt(v)}`).join(' ');
+  const areaPts = `${padL},${padT+plotH} ${pts} ${W-padR},${padT+plotH}`;
+  const area = document.createElementNS(NS,'polygon');
+  area.setAttribute('points', areaPts);
+  area.setAttribute('fill', opts.color);
+  area.setAttribute('fill-opacity', '0.08');
+  svg.appendChild(area);
+
+  const line = document.createElementNS(NS,'polyline');
+  line.setAttribute('points', pts);
+  line.setAttribute('fill','none');
+  line.setAttribute('stroke', opts.color);
+  line.setAttribute('stroke-width','2.2');
+  line.setAttribute('stroke-linecap','round');
+  line.setAttribute('stroke-linejoin','round');
+  svg.appendChild(line);
+
+  const lastX = xAt(values.length-1), lastY = yAt(values[values.length-1]);
+  const dot = document.createElementNS(NS,'circle');
+  dot.setAttribute('cx', lastX); dot.setAttribute('cy', lastY); dot.setAttribute('r','3');
+  dot.setAttribute('fill', opts.color);
+  svg.appendChild(dot);
+
+  if(opts.markerIndex !== undefined && opts.markerIndex >= 0){
+    const mx = xAt(opts.markerIndex), my = yAt(values[opts.markerIndex]);
+    const mc = document.createElementNS(NS,'circle');
+    mc.setAttribute('cx', mx); mc.setAttribute('cy', my); mc.setAttribute('r','3.5');
+    mc.setAttribute('fill', '#fff'); mc.setAttribute('stroke', opts.markerColor || '#b5533c');
+    mc.setAttribute('stroke-width','2');
+    svg.appendChild(mc);
+  }
+
+  container.appendChild(svg);
+}
+
+function render(){
+  const distraction = Number(document.getElementById('distraction').value);
+  const networkRate = Number(document.getElementById('networkRate').value);
+  const goalHours = Number(document.getElementById('goalHours').value);
+
+  document.getElementById('distractionVal').textContent = distraction;
+  document.getElementById('networkRateVal').textContent = networkRate;
+  document.getElementById('goalHoursVal').textContent = goalHours.toLocaleString();
+
+  const { data, tippingMonth, safeMinutes, finalProbability } = computeData(distraction, networkRate, goalHours);
+  const isCritical = tippingMonth !== null;
+  const minutesToCut = Math.max(0, distraction - safeMinutes);
+
+  document.getElementById('pctValue').textContent = finalProbability.toFixed(0) + '%';
+  document.getElementById('pctValue').style.color = finalProbability >= 50 ? 'var(--accent)' : 'var(--warn)';
+
+  const fill = document.getElementById('barFill');
+  fill.style.width = finalProbability + '%';
+  fill.style.background = finalProbability >= 50 ? 'var(--accent)' : 'var(--warn)';
+
+  const msg = document.getElementById('message');
+  if(isCritical){
+    msg.className = 'message warn';
+    msg.innerHTML = minutesToCut > 0
+      ? `เมื่อถึง <strong>เดือนที่ ${tippingMonth}</strong> โอกาสสำเร็จจะลดต่ำกว่า 50% — ลองลดเวลาหลุดโฟกัสเหลือ <strong>${safeMinutes} นาที/วัน</strong> (ลดลง ~${minutesToCut} นาที) เพื่อรักษาโอกาสไว้เหนือ 50% นี่คือสัญญาณเตือน ไม่ใช่คำตัดสิน`
+      : `เมื่อถึง <strong>เดือนที่ ${tippingMonth}</strong> โอกาสสำเร็จจะลดต่ำกว่า 50% นี่คือสัญญาณเตือน ไม่ใช่คำตัดสิน เป้าหมายยังไปถึงได้ถ้าปรับพฤติกรรมตอนนี้`;
+  } else {
+    msg.className = 'message';
+    msg.innerHTML = `เวลาที่เสียไปยังไม่มากพอที่จะทำให้โอกาสสำเร็จตกต่ำกว่า 50% ตลอด 3 ปี — รักษาจังหวะนี้ไว้`;
+  }
+
+  renderLineChart('chartProb', data.map(d=>d.successProbability), {
+    min: 0, max: 100, color: '#3b6e5e', refValue: 50,
+    markerIndex: isCritical ? tippingMonth-1 : undefined, markerColor: '#b5533c'
+  });
+
+  renderLineChart('chartOpp', data.map(d=>d.compoundedOpportunities), {
+    color: '#b5533c'
+  });
+}
+
+['distraction','networkRate','goalHours'].forEach(id=>{
+  document.getElementById(id).addEventListener('input', render);
+});
+render();
+</script>
+</body>
+</html>
