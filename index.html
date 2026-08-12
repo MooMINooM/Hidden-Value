@@ -13,28 +13,146 @@ header{display:flex;justify-content:space-between;gap:10px;align-items:flex-end;
 .controls{display:grid;gap:5px}.top{display:flex;justify-content:space-between;gap:6px;font-weight:700;font-size:11.5px}.value{color:var(--blue);white-space:nowrap}.help{font-size:8.5px;color:var(--muted);margin:1px 0 3px;line-height:1.2}.scenario{border-radius:9px;padding:6px 7px;border:1px solid var(--line)}.scenario.a{background:var(--warm)}.scenario.b{background:var(--soft)}.scenario h3{margin:0 0 3px;font-size:13px}
 input[type=range]{width:100%;accent-color:var(--blue);height:12px;margin:0}input[type=range]::-webkit-slider-thumb{width:10px;height:10px}input[type=range]::-moz-range-thumb{width:10px;height:10px;border:none;background:var(--blue)}
 .formula{margin-top:6px;background:#faf9f7;border:1px dashed #d4cdc2;border-radius:9px;padding:6px 7px;line-height:1.28;font-size:9.2px}.formula code{font-family:Cambria,serif;font-size:11px}.formula small{display:block;margin-top:2px;color:var(--muted);font-size:8px}
-.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;flex:0 0 auto}.metric{border:1px solid var(--line);border-radius:11px;padding:7px 8px;min-height:68px}.metric strong{display:block;font-size:clamp(19px,1.8vw,27px);margin-top:3px;line-height:1.08}.metric span{font-size:9.5px;color:var(--muted);line-height:1.15}.metric.core{background:#eee6fb;border-color:#d9c9ef}.metric.gap{background:#eef4fa}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;flex:0 0 auto}.metric{border:1px solid var(--line);border-radius:11px;padding:7px 8px;min-height:68px}.metric strong{display:block;font-size:clamp(17px,1.7vw,25px);margin-top:3px;line-height:1.08}.metric span{font-size:9.5px;color:var(--muted);line-height:1.15}.metric.core{background:#eee6fb;border-color:#d9c9ef}.metric.gap{background:#eef4fa}
 .summary{margin-top:6px;padding:7px 9px;border-radius:10px;background:var(--violet-soft);line-height:1.35;font-size:10.5px;flex:0 0 auto}.charts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:7px;flex:1;min-height:0}.chartbox{border:1px solid var(--line);border-radius:11px;padding:8px;display:flex;flex-direction:column;min-width:0;min-height:0;overflow:hidden}.charttitle{font-weight:800;font-size:11px;line-height:1.2}.chartdesc{font-size:9px;color:var(--muted);margin:1px 0 3px;line-height:1.2}.chart{flex:1;min-height:275px;overflow:hidden}.chart svg{width:100%;height:100%;display:block}
 .table{width:100%;border-collapse:collapse;margin-top:5px;font-size:9.5px;flex:0 0 auto}.table th,.table td{padding:3px 4px;border-bottom:1px solid var(--line);text-align:right}.table th:first-child,.table td:first-child{text-align:left}.table thead th{font-size:9px;color:#4a4f58}footer{text-align:center;color:var(--muted);font-size:8.5px;line-height:1.25;margin-top:5px;flex:0 0 auto}
 @media(max-width:1050px){.app{height:auto;min-height:100vh;overflow:visible}.grid{grid-template-columns:1fr}.charts{grid-template-columns:1fr}.chart{min-height:300px}.metrics{grid-template-columns:repeat(2,1fr)}}@media(max-width:650px){.app{padding:7px}header{flex-direction:column;align-items:flex-start}.tag{white-space:normal}.metrics{grid-template-columns:1fr 1fr}}
 </style></head>
-<body><div class="app"><header><div><h1>เศษเวลาที่หายกับความหมายของชีวิต</h1><p>แบบจำลองการสะสมของโอกาสที่สูญเสียตามแนวคิดผลกระทบแบบผีเสื้อ</p></div><div class="tag">Butterfly Effect Model</div></header>
+<body><div class="app"><header><div><h1>เศษเวลาที่หายกับความหมายของชีวิต</h1><p>แบบจำลองมอนติคาร์โล: ความไม่แน่นอนรายเดือนที่สะสมผ่านดอกเบี้ยทบต้น จนกลายเป็นสัญญาณที่แยกออกจากสัญญาณรบกวนได้ชัดขึ้นตามเวลา</p></div><div class="tag">Monte Carlo Compounding Model</div></header>
 <div class="grid"><section class="card left"><h2>กำหนดจุดเริ่มต้น</h2><div class="controls">
-<div class="scenario a"><h3>สถานการณ์ A</h3><div class="top"><span>เวลาหลุดโฟกัสต่อวัน</span><span class="value"><span id="aVal">30</span> นาที</span></div><input id="aMinutes" type="range" min="0" max="180" step="1" value="30"></div>
-<div class="scenario b"><h3>สถานการณ์ B</h3><div class="top"><span>เวลาหลุดโฟกัสต่อวัน</span><span class="value"><span id="bVal">35</span> นาที</span></div><div class="help">ตั้งให้ต่างจาก A เพียงเล็กน้อย เพื่อดูการขยายความแตกต่าง</div><input id="bMinutes" type="range" min="0" max="180" step="1" value="35"></div>
+<div class="scenario a"><h3>สถานการณ์ A</h3><div class="top"><span>เวลาหลุดโฟกัสต่อวัน (ค่าเฉลี่ย)</span><span class="value"><span id="aVal">30</span> นาที</span></div><input id="aMinutes" type="range" min="0" max="180" step="1" value="30"></div>
+<div class="scenario b"><h3>สถานการณ์ B</h3><div class="top"><span>เวลาหลุดโฟกัสต่อวัน (ค่าเฉลี่ย)</span><span class="value"><span id="bVal">35</span> นาที</span></div><div class="help">ผลต่างเริ่มต้นเท่าไรก็ได้ สิ่งที่เปลี่ยนคือระยะเวลาที่ต้องใช้ให้สัญญาณนี้ชนะสัญญาณรบกวนรายเดือน (ดูกราฟขวาล่าง)</div><input id="bMinutes" type="range" min="0" max="180" step="1" value="35"></div>
 <div><div class="top"><span>จำนวนวันที่เกิดพฤติกรรมต่อเดือน</span><span class="value"><span id="daysVal">20</span> วัน</span></div><input id="days" type="range" min="1" max="30" value="20"></div>
 <div><div class="top"><span>ระยะเวลาจำลอง</span><span class="value"><span id="monthsVal">36</span> เดือน</span></div><input id="months" type="range" min="6" max="60" step="6" value="36"></div>
-<div><div class="top"><span>อัตราผลกระทบต่อเนื่องต่อปี</span><span class="value"><span id="rateVal">15</span>%</span></div><div class="help">แทนการขาดความต่อเนื่องและโอกาสต่อยอดที่ลดลง</div><input id="rate" type="range" min="0" max="50" value="15"></div>
-<div><div class="top"><span>ชั่วโมงต่อหนึ่งหน่วยโอกาส</span><span class="value"><span id="unitVal">20</span> ชม.</span></div><input id="unit" type="range" min="5" max="60" step="5" value="20"></div></div>
-<div class="formula"><b>สมการหลัก</b><br><code>p = md/(60q)</code><br><code>Lₜ = (Lₜ₋₁ + p)(1+i)</code><br><code>Dₜ = |Lₜᴬ − Lₜᴮ|</code><br><code>Mₜ = Eₜ/Hₜ</code><br><code>BSI = Eₜ/8</code><small>M คือ ตัวคูณผลกระทบต่อเนื่อง และ BSI คือ ดัชนีผลกระทบแบบผีเสื้อ (1 คะแนน = 1 วันเรียน)</small></div></section>
-<section class="card right"><h2>ผลของความแตกต่างเล็กน้อย</h2><div class="metrics"><div class="metric"><span>จุดเริ่มต้นต่างกัน</span><strong id="startGap">—</strong><span>นาทีต่อวัน</span></div><div class="metric gap"><span>เวลาสูญเสียจริงต่างกัน</span><strong id="hourGap">—</strong><span id="dayGap">—</span></div><div class="metric"><span>ตัวคูณผลกระทบต่อเนื่อง</span><strong id="multiplier">—</strong><span>เท่าของผลต่างโดยตรง</span></div><div class="metric core"><span>ดัชนีผลกระทบแบบผีเสื้อ</span><strong id="butterflyIndex">—</strong><span>คะแนน (1 คะแนน = 1 วันเรียน)</span></div></div>
-<div class="summary" id="summary"></div><div class="charts"><div class="chartbox"><div class="charttitle">กราฟเปรียบเทียบเส้นทางการสูญเสียโอกาส</div><div class="chartdesc">เปรียบเทียบสถานการณ์ A และ B ภายใต้เงื่อนไขเดียวกัน</div><div class="chart" id="paths"></div></div><div class="chartbox"><div class="charttitle">กราฟระยะห่างของผลลัพธ์</div><div class="chartdesc">แสดงความต่างที่เพิ่มขึ้นตามเวลา</div><div class="chart" id="gapChart"></div></div></div>
-<table class="table"><thead><tr><th>ช่วงเวลา</th><th>A: ชั่วโมงสูญเสีย</th><th>B: ชั่วโมงสูญเสีย</th><th>ผลต่างเทียบเท่า</th><th>BSI</th></tr></thead><tbody id="rows"></tbody></table></section></div>
-<footer>แบบจำลองนี้ประยุกต์แนวคิดความไวต่อจุดเริ่มต้นในระดับมัธยมศึกษา ไม่ใช่การพิสูจน์ระบบโกลาหลอย่างสมบูรณ์ และไม่ใช้ทำนายอนาคตของบุคคล</footer></div>
+<div><div class="top"><span>อัตราผลกระทบต่อเนื่องต่อปี</span><span class="value"><span id="rateVal">15</span>%</span></div><div class="help">แทนการขาดความต่อเนื่องและโอกาสต่อยอดที่ลดลง (deterministic ไม่มีสุ่ม)</div><input id="rate" type="range" min="0" max="50" value="15"></div>
+<div><div class="top"><span>ชั่วโมงต่อหนึ่งหน่วยโอกาส</span><span class="value"><span id="unitVal">20</span> ชม.</span></div><input id="unit" type="range" min="5" max="60" step="5" value="20"></div>
+<div><div class="top"><span>ความแปรปรวนรายเดือน (CV)</span><span class="value"><span id="cvVal">25</span>%</span></div><div class="help">สัดส่วนความสุ่มของเวลาหลุดโฟกัสในแต่ละเดือน (ทุกครั้งที่เลื่อนแถบใดๆ ระบบสุ่มตัวอย่างใหม่ 400 รอบ ตัวเลขจึงกระเพื่อมเล็กน้อยได้ตามธรรมชาติของมอนติคาร์โล)</div><input id="cv" type="range" min="0" max="60" step="5" value="25"></div></div>
+<div class="formula"><b>สมการหลัก (มอนติคาร์โล)</b><br><code>m̃ₜ ~ N(m, (m·cv)²), ตัดที่ 0</code><br><code>pₜ = m̃ₜd/(60q)</code><br><code>Lₜ = (Lₜ₋₁ + pₜ)(1+i)</code><br><code>Eₜ = Lₜ·q</code><br><code>P(t) = สัดส่วนคู่ทดลอง (Eᴮ &gt; Eᴬ) จาก N=400 รอบ</code><br><code>dₜ = (Ēₜᴮ − Ēₜᴬ)/√((σₜᴬ² + σₜᴮ²)/2)</code><small>P(t) คือความน่าจะเป็นที่ B แย่กว่า A ในเดือนนั้น, dₜ คือ Cohen's d (ขนาดผลต่างเทียบส่วนเบี่ยงเบนมาตรฐาน) ทั้งคู่ประมาณจากการสุ่ม 400 รอบต่อสถานการณ์ทุกครั้งที่คำนวณใหม่</small></div></section>
+<section class="card right"><h2>ผลของความแตกต่างเล็กน้อยภายใต้ความไม่แน่นอน</h2><div class="metrics"><div class="metric"><span>จุดเริ่มต้นต่างกัน</span><strong id="startGap">—</strong><span>นาทีต่อวัน</span></div><div class="metric gap"><span>เวลาสูญเสียจริงต่างกัน (ค่าคาดหวัง)</span><strong id="hourGap">—</strong><span id="dayGap">—</span></div><div class="metric"><span>P(B แย่กว่า A) เดือนสุดท้าย</span><strong id="pFinal">—</strong><span>จาก 400 รอบจำลอง</span></div><div class="metric core"><span>เดือนที่แยกออกจากสัญญาณรบกวนชัดเจน</span><strong id="sepMonth">—</strong><span>เดือนแรกที่ P(B&gt;A) ≥ 90%</span></div></div>
+<div class="summary" id="summary"></div><div class="charts"><div class="chartbox"><div class="charttitle">กราฟช่วงผลลัพธ์ (fan chart)</div><div class="chartdesc">เส้นทึบ = ค่ามัธยฐาน, แถบสี = ช่วง 10th–90th percentile จาก 400 รอบจำลอง</div><div class="chart" id="paths"></div></div><div class="chartbox"><div class="charttitle">ความน่าจะเป็นที่ B แย่กว่า A ตามเวลา</div><div class="chartdesc">เส้นประ = 50% (สุ่มล้วน) และ 90% (แยกออกจากกันชัดเจน)</div><div class="chart" id="probChart"></div></div></div>
+<table class="table"><thead><tr><th>ช่วงเวลา</th><th>A: มัธยฐาน (10–90 pct) ชม.</th><th>B: มัธยฐาน (10–90 pct) ชม.</th><th>P(B&gt;A)</th><th>Cohen's d</th></tr></thead><tbody id="rows"></tbody></table></section></div>
+<footer>แบบจำลองนี้คือการจำลองมอนติคาร์โล (สุ่ม 400 รอบต่อสถานการณ์ทุกครั้งที่คำนวณใหม่) ไม่ใช่ระบบโกลาหลที่พิสูจน์ทางคณิตศาสตร์อย่างเข้มงวด สิ่งที่แสดงคือ: ความต่างเชิงระบบเล็กๆ ระหว่าง A กับ B เมื่อผสมกับความสุ่มรายเดือนและดอกเบี้ยทบต้น จะค่อยๆ ชนะสัญญาณรบกวนจนแยกออกมาเห็นได้ชัดขึ้นเรื่อยๆ — ไม่ใช่ทันทีที่เดือนแรก ตัวเลข P(t) และ d ต่างจากรอบก่อนหน้าเล็กน้อยได้ทุกครั้งที่คำนวณใหม่ เพราะเป็นการประมาณค่าจากการสุ่ม ไม่ใช่ค่าปิดที่ตายตัว และไม่ใช้ทำนายอนาคตของบุคคล</footer></div>
 <script>
-const $=id=>document.getElementById(id),NS='http://www.w3.org/2000/svg';const fmt=(v,d=1)=>Number(v).toLocaleString('th-TH',{minimumFractionDigits:d,maximumFractionDigits:d});
-function run(minutes,days,months,annualRate,unit){const i=Math.pow(1+annualRate/100,1/12)-1,p=minutes*days/(60*unit);let L=0,h=0,data=[];for(let t=1;t<=months;t++){h+=minutes*days/60;L=(L+p)*(1+i);data.push({t,h,L,e:L*unit})}return data}
-function graph(el,series,min=0){el.innerHTML='';const W=700,H=350,L=58,R=18,T=18,B=42,PW=W-L-R,PH=H-T-B,all=series.flatMap(s=>s.v),max=Math.max(...all,1),range=max-min||1,n=Math.max(...series.map(s=>s.v.length)),x=i=>L+i/(n-1||1)*PW,y=v=>T+PH-(v-min)/range*PH,svg=document.createElementNS(NS,'svg');svg.setAttribute('viewBox',`0 0 ${W} ${H}`);svg.setAttribute('preserveAspectRatio','xMidYMid meet');[min,(min+max)/2,max].forEach(v=>{const ln=document.createElementNS(NS,'line');ln.setAttribute('x1',L);ln.setAttribute('x2',W-R);ln.setAttribute('y1',y(v));ln.setAttribute('y2',y(v));ln.setAttribute('stroke','#e8e3db');ln.setAttribute('stroke-width','1.2');svg.appendChild(ln);const tx=document.createElementNS(NS,'text');tx.setAttribute('x',L-8);tx.setAttribute('y',y(v)+4);tx.setAttribute('text-anchor','end');tx.setAttribute('font-size','12');tx.setAttribute('fill','#666');tx.textContent=fmt(v,0);svg.appendChild(tx)});series.forEach((s,j)=>{const pl=document.createElementNS(NS,'polyline');pl.setAttribute('points',s.v.map((v,i)=>`${x(i)},${y(v)}`).join(' '));pl.setAttribute('fill','none');pl.setAttribute('stroke',s.c);pl.setAttribute('stroke-width','3.4');pl.setAttribute('stroke-linejoin','round');pl.setAttribute('stroke-linecap','round');svg.appendChild(pl);const tx=document.createElementNS(NS,'text');tx.setAttribute('x',L+10);tx.setAttribute('y',T+17+j*19);tx.setAttribute('font-size','12');tx.setAttribute('font-weight','700');tx.setAttribute('fill',s.c);tx.textContent=s.n;svg.appendChild(tx)});[0,n-1].forEach(i=>{const tx=document.createElementNS(NS,'text');tx.setAttribute('x',x(i));tx.setAttribute('y',H-11);tx.setAttribute('text-anchor',i?'end':'start');tx.setAttribute('font-size','12');tx.setAttribute('fill','#666');tx.textContent=`เดือน ${i+1}`;svg.appendChild(tx)});el.appendChild(svg)}
-function render(){const a=+$('aMinutes').value,b=+$('bMinutes').value,d=+$('days').value,m=+$('months').value,r=+$('rate').value,q=+$('unit').value;$('aVal').textContent=a;$('bVal').textContent=b;$('daysVal').textContent=d;$('monthsVal').textContent=m;$('rateVal').textContent=r;$('unitVal').textContent=q;const A=run(a,d,m,r,q),B=run(b,d,m,r,q),hourGap=Math.abs(A.at(-1).h-B.at(-1).h),equivGap=Math.abs(A.at(-1).e-B.at(-1).e),multiplier=hourGap===0?0:equivGap/hourGap,BSI=equivGap/8,gaps=A.map((x,i)=>Math.abs(x.e-B[i].e));$('startGap').textContent=fmt(Math.abs(a-b),0);$('hourGap').textContent=`${fmt(hourGap)} ชม.`;$('dayGap').textContent=`≈ ${fmt(hourGap/8)} วันเรียน`;$('multiplier').textContent=`${fmt(multiplier,2)}×`;$('butterflyIndex').textContent=fmt(BSI,2);$('summary').innerHTML=`แม้จุดเริ่มต้นของทั้งสองสถานการณ์จะต่างกันเพียง <strong>${fmt(Math.abs(a-b),0)} นาทีต่อวัน</strong> แต่เมื่อเกิดซ้ำ ${m} เดือน จะทำให้เวลาสูญเสียจริงต่างกัน <strong>${fmt(hourGap)} ชั่วโมง</strong> และเมื่อรวมผลกระทบต่อเนื่องตามแบบจำลอง ผลต่างเทียบเท่าจะเพิ่มเป็น <strong>${fmt(equivGap)} ชั่วโมง</strong> หรือประมาณ <strong>${fmt(BSI,2)} วันเรียน</strong> โดยมีตัวคูณผลกระทบต่อเนื่อง <strong>${fmt(multiplier,2)} เท่า</strong>`;graph($('paths'),[{n:'สถานการณ์ A',v:A.map(x=>x.e),c:'#b85d45'},{n:'สถานการณ์ B',v:B.map(x=>x.e),c:'#2f7063'}]);graph($('gapChart'),[{n:'ผลต่างเทียบเท่า',v:gaps,c:'#634c8c'}]);const marks=[1,Math.min(12,m),Math.min(24,m),m].filter((v,i,a)=>a.indexOf(v)===i);$('rows').innerHTML=marks.map(t=>{const x=A[t-1],y=B[t-1],gap=Math.abs(x.e-y.e),bsi=gap/8;return `<tr><td>เดือน ${t}</td><td>${fmt(x.h)}</td><td>${fmt(y.h)}</td><td>${fmt(gap)}</td><td>${fmt(bsi,2)}</td></tr>`}).join('')}
-['aMinutes','bMinutes','days','months','rate','unit'].forEach(id=>$(id).addEventListener('input',render));render();
+const $=id=>document.getElementById(id),NS='http://www.w3.org/2000/svg';
+const fmt=(v,d=1)=>Number(v).toLocaleString('th-TH',{minimumFractionDigits:d,maximumFractionDigits:d});
+const NTRIALS=400;
+
+function gaussianRandom(){let u=0,v=0;while(u===0)u=Math.random();while(v===0)v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
+
+function simulate(minutes,days,months,annualRate,unit,cvPct,trials){
+  const i=Math.pow(1+annualRate/100,1/12)-1;
+  const all=[];
+  for(let s=0;s<trials;s++){
+    let L=0;const path=[];
+    for(let t=1;t<=months;t++){
+      const mTilde=Math.max(0, minutes + gaussianRandom()*minutes*(cvPct/100));
+      const p=mTilde*days/(60*unit);
+      L=(L+p)*(1+i);
+      path.push(L*unit);
+    }
+    all.push(path);
+  }
+  return all;
+}
+
+function percentileOf(sortedArr,p){const idx=Math.min(sortedArr.length-1,Math.max(0,Math.round(p/100*(sortedArr.length-1))));return sortedArr[idx]}
+
+function monthStats(trials,tIdx){
+  const v=trials.map(tr=>tr[tIdx]).sort((a,b)=>a-b);
+  const mean=v.reduce((a,b)=>a+b,0)/v.length;
+  const va=v.reduce((a,b)=>a+(b-mean)**2,0)/v.length;
+  return{p10:percentileOf(v,10),p50:percentileOf(v,50),p90:percentileOf(v,90),mean,va};
+}
+
+function pOverSeries(A,B,months){
+  const res=[];const n=A.length;
+  for(let t=0;t<months;t++){let c=0;for(let k=0;k<n;k++) if(B[k][t]>A[k][t]) c++;res.push(c/n)}
+  return res;
+}
+
+function fanChart(el,months,statsA,statsB){
+  el.innerHTML='';
+  const W=700,H=350,L=58,R=18,T=18,B=42,PW=W-L-R,PH=H-T-B;
+  const allVals=[...statsA.map(s=>s.p90),...statsB.map(s=>s.p90),0];
+  const max=Math.max(...allVals,1),min=0,range=max-min||1;
+  const n=months,x=i=>L+i/(n-1||1)*PW,y=v=>T+PH-(v-min)/range*PH;
+  const svg=document.createElementNS(NS,'svg');
+  svg.setAttribute('viewBox',`0 0 ${W} ${H}`);svg.setAttribute('preserveAspectRatio','xMidYMid meet');
+  [min,(min+max)/2,max].forEach(v=>{
+    const ln=document.createElementNS(NS,'line');ln.setAttribute('x1',L);ln.setAttribute('x2',W-R);ln.setAttribute('y1',y(v));ln.setAttribute('y2',y(v));ln.setAttribute('stroke','#e8e3db');ln.setAttribute('stroke-width','1.2');svg.appendChild(ln);
+    const tx=document.createElementNS(NS,'text');tx.setAttribute('x',L-8);tx.setAttribute('y',y(v)+4);tx.setAttribute('text-anchor','end');tx.setAttribute('font-size','12');tx.setAttribute('fill','#666');tx.textContent=fmt(v,0);svg.appendChild(tx);
+  });
+  [{s:statsA,c:'#b85d45',n:'สถานการณ์ A'},{s:statsB,c:'#2f7063',n:'สถานการณ์ B'}].forEach((series,j)=>{
+    const top=series.s.map((st,i)=>`${x(i)},${y(st.p90)}`);
+    const bot=series.s.slice().reverse().map((st,i)=>`${x(series.s.length-1-i)},${y(st.p10)}`);
+    const poly=document.createElementNS(NS,'polygon');
+    poly.setAttribute('points',[...top,...bot].join(' '));
+    poly.setAttribute('fill',series.c);poly.setAttribute('fill-opacity','0.15');poly.setAttribute('stroke','none');
+    svg.appendChild(poly);
+    const pl=document.createElementNS(NS,'polyline');
+    pl.setAttribute('points',series.s.map((st,i)=>`${x(i)},${y(st.p50)}`).join(' '));
+    pl.setAttribute('fill','none');pl.setAttribute('stroke',series.c);pl.setAttribute('stroke-width','3');pl.setAttribute('stroke-linejoin','round');pl.setAttribute('stroke-linecap','round');
+    svg.appendChild(pl);
+    const tx=document.createElementNS(NS,'text');tx.setAttribute('x',L+10);tx.setAttribute('y',T+17+j*19);tx.setAttribute('font-size','12');tx.setAttribute('font-weight','700');tx.setAttribute('fill',series.c);tx.textContent=series.n;svg.appendChild(tx);
+  });
+  [0,n-1].forEach(i=>{const tx=document.createElementNS(NS,'text');tx.setAttribute('x',x(i));tx.setAttribute('y',H-11);tx.setAttribute('text-anchor',i?'end':'start');tx.setAttribute('font-size','12');tx.setAttribute('fill','#666');tx.textContent=`เดือน ${i+1}`;svg.appendChild(tx)});
+  el.appendChild(svg);
+}
+
+function probChart(el,months,pSeries){
+  el.innerHTML='';
+  const W=700,H=350,L=44,R=18,T=18,B=42,PW=W-L-R,PH=H-T-B;
+  const n=months,x=i=>L+i/(n-1||1)*PW,y=v=>T+PH-v*PH;
+  const svg=document.createElementNS(NS,'svg');
+  svg.setAttribute('viewBox',`0 0 ${W} ${H}`);svg.setAttribute('preserveAspectRatio','xMidYMid meet');
+  [0,0.5,0.9,1].forEach(v=>{
+    const ln=document.createElementNS(NS,'line');ln.setAttribute('x1',L);ln.setAttribute('x2',W-R);ln.setAttribute('y1',y(v));ln.setAttribute('y2',y(v));
+    ln.setAttribute('stroke',v===0.5||v===0.9?'#c9a0a0':'#e8e3db');ln.setAttribute('stroke-width', v===0.5||v===0.9?'1.4':'1');
+    if(v===0.5||v===0.9) ln.setAttribute('stroke-dasharray','4 3');
+    svg.appendChild(ln);
+    const tx=document.createElementNS(NS,'text');tx.setAttribute('x',L-6);tx.setAttribute('y',y(v)+4);tx.setAttribute('text-anchor','end');tx.setAttribute('font-size','11');tx.setAttribute('fill','#666');tx.textContent=`${Math.round(v*100)}%`;svg.appendChild(tx);
+  });
+  const pl=document.createElementNS(NS,'polyline');
+  pl.setAttribute('points',pSeries.map((v,i)=>`${x(i)},${y(v)}`).join(' '));
+  pl.setAttribute('fill','none');pl.setAttribute('stroke','#634c8c');pl.setAttribute('stroke-width','3');pl.setAttribute('stroke-linejoin','round');pl.setAttribute('stroke-linecap','round');
+  svg.appendChild(pl);
+  [0,n-1].forEach(i=>{const tx=document.createElementNS(NS,'text');tx.setAttribute('x',x(i));tx.setAttribute('y',H-11);tx.setAttribute('text-anchor',i?'end':'start');tx.setAttribute('font-size','12');tx.setAttribute('fill','#666');tx.textContent=`เดือน ${i+1}`;svg.appendChild(tx)});
+  el.appendChild(svg);
+}
+
+function render(){
+  const a=+$('aMinutes').value,b=+$('bMinutes').value,d=+$('days').value,m=+$('months').value,r=+$('rate').value,q=+$('unit').value,cv=+$('cv').value;
+  $('aVal').textContent=a;$('bVal').textContent=b;$('daysVal').textContent=d;$('monthsVal').textContent=m;$('rateVal').textContent=r;$('unitVal').textContent=q;$('cvVal').textContent=cv;
+
+  const trialsA=simulate(a,d,m,r,q,cv,NTRIALS);
+  const trialsB=simulate(b,d,m,r,q,cv,NTRIALS);
+  const statsA=[],statsB=[];
+  for(let t=0;t<m;t++){statsA.push(monthStats(trialsA,t));statsB.push(monthStats(trialsB,t))}
+  const pSeries=pOverSeries(trialsA,trialsB,m);
+  const dSeries=statsA.map((sa,t)=>{const sb=statsB[t];const pooled=Math.sqrt((sa.va+sb.va)/2)||1e-9;return (sb.mean-sa.mean)/pooled});
+
+  const hourGap=Math.abs(a-b)*d*m/60; // ค่าคาดหวังเชิงกำหนด (ไม่มีสุ่ม)
+  const pFinal=pSeries[m-1];
+  let sepIdx=pSeries.findIndex(p=>p>=0.9);
+  const sepMonth=sepIdx===-1?'ยังไม่ถึง':`เดือน ${sepIdx+1}`;
+
+  $('startGap').textContent=fmt(Math.abs(a-b),0);
+  $('hourGap').textContent=`${fmt(hourGap)} ชม.`;
+  $('dayGap').textContent=`≈ ${fmt(hourGap/8)} วันเรียน`;
+  $('pFinal').textContent=`${fmt(pFinal*100,1)}%`;
+  $('sepMonth').textContent=sepMonth;
+
+  $('summary').innerHTML=`จุดเริ่มต้นของทั้งสองสถานการณ์ต่างกันเพียง <strong>${fmt(Math.abs(a-b),0)} นาทีต่อวัน</strong> ซึ่งเมื่อเทียบกับความแปรปรวนรายเดือน ${cv}% แล้วแทบแยกไม่ออกจากสัญญาณรบกวนในเดือนแรกๆ แต่จากการสุ่มจำลอง ${NTRIALS} รอบต่อสถานการณ์ ความน่าจะเป็นที่ B จะสะสมผลกระทบมากกว่า A ค่อยๆ ไต่จาก ${fmt(pSeries[0]*100,0)}% ในเดือนแรก ไปถึง <strong>${fmt(pFinal*100,1)}%</strong> ในเดือนที่ ${m} และแยกออกจากสัญญาณรบกวนอย่างชัดเจน (P≥90%) ตั้งแต่${sepIdx===-1?'ยังไม่ถึงในช่วงที่จำลองไว้':'"'+sepMonth+'"'} — ตัวเลขจะกระเพื่อมเล็กน้อยทุกครั้งที่คำนวณใหม่เพราะเป็นการประมาณจากการสุ่ม`;
+
+  fanChart($('paths'),m,statsA,statsB);
+  probChart($('probChart'),m,pSeries);
+
+  const marks=[1,Math.min(12,m),Math.min(24,m),m].filter((v,i,arr)=>arr.indexOf(v)===i);
+  $('rows').innerHTML=marks.map(t=>{
+    const sa=statsA[t-1],sb=statsB[t-1],p=pSeries[t-1],dv=dSeries[t-1];
+    return `<tr><td>เดือน ${t}</td><td>${fmt(sa.p50)} (${fmt(sa.p10)}–${fmt(sa.p90)})</td><td>${fmt(sb.p50)} (${fmt(sb.p10)}–${fmt(sb.p90)})</td><td>${fmt(p*100,1)}%</td><td>${fmt(dv,2)}</td></tr>`;
+  }).join('');
+}
+['aMinutes','bMinutes','days','months','rate','unit','cv'].forEach(id=>$(id).addEventListener('input',render));
+render();
 </script></body></html>
